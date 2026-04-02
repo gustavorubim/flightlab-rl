@@ -1,0 +1,5 @@
+task: landing
+final_distance_m: 250.0
+flare_height_m: 6.0
+stop_speed_mps: 4.0
+touchdown_sink_limit_mps: 2.5

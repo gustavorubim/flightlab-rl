@@ -1,0 +1,4 @@
+task: takeoff
+rotation_speed_mps: 24.0
+success_altitude_agl_m: 30.0
+max_centerline_error_m: 20.0

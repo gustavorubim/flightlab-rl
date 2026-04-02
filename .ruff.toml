@@ -1,0 +1,18 @@
+target-version = "py313"
+line-length = 100
+
+[lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+  "UP",
+  "N",
+  "SIM",
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false

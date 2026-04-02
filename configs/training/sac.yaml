@@ -1,0 +1,3 @@
+algorithm: sac
+timesteps: 2000
+seed: 42

@@ -1,0 +1,5 @@
+name: trainer
+mass_kg: 1200.0
+cg_offset_m: 0.0
+stall_speed_mps: 18.0
+rotation_speed_mps: 24.0

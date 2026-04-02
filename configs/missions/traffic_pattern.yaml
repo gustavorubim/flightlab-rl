@@ -1,0 +1,20 @@
+name: traffic_pattern
+waypoints:
+  - name: upwind
+    x_m: 200.0
+    y_m: 0.0
+    altitude_m: 140.0
+    target_airspeed_mps: 26.0
+    acceptance_radius_m: 40.0
+  - name: crosswind
+    x_m: 350.0
+    y_m: 220.0
+    altitude_m: 155.0
+    target_airspeed_mps: 27.0
+    acceptance_radius_m: 40.0
+  - name: downwind
+    x_m: 120.0
+    y_m: 320.0
+    altitude_m: 145.0
+    target_airspeed_mps: 25.0
+    acceptance_radius_m: 40.0

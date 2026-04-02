@@ -1,0 +1,5 @@
+task: flight_plan
+max_cross_track_error_m: 120.0
+max_altitude_error_m: 80.0
+completion_bonus: 2.0
+waypoint_bonus: 0.5
