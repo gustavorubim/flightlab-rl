@@ -84,6 +84,7 @@ class BaseFlightEnv(gym.Env[np.ndarray, np.ndarray], ABC):
         observation = self._observe(state)
         info = self._build_info(self._reset_evaluation(state))
         info["seed"] = effective_seed
+        self._last_info = info
         self._recorder.record_reset(state, info)
         self._latest_observation = observation
         return observation, info
@@ -131,6 +132,13 @@ class BaseFlightEnv(gym.Env[np.ndarray, np.ndarray], ABC):
     def export_replay(self, path: str) -> str:
         """Export the current episode replay to JSON."""
         return str(self._recorder.export_json(path))
+
+    def episode_summary(self, *, success: bool | None = None) -> dict[str, float | bool]:
+        """Return a benchmark-friendly summary for the current episode state."""
+        effective_success = (
+            bool(self._last_info.get("success", False)) if success is None else success
+        )
+        return self._episode_summary(info=self._last_info, success=effective_success)
 
     def _episode_summary(self, *, info: dict[str, Any], success: bool) -> dict[str, float | bool]:
         """Build a benchmark-friendly per-episode summary."""

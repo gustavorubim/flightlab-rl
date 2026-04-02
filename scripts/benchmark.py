@@ -35,7 +35,10 @@ def main() -> None:
             _observation, _reward, terminated, truncated, final_info = env.step(action)
             if terminated or truncated:
                 break
-        episodes.append(final_info.get("episode_summary", {}))
+        summary = final_info.get("episode_summary")
+        if not isinstance(summary, dict):
+            summary = env.episode_summary()
+        episodes.append(summary)
     print(summarize_episodes(episodes))
 
 

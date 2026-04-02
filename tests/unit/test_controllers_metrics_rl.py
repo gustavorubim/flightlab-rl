@@ -62,6 +62,10 @@ def test_summarize_episodes_handles_empty_and_non_empty_input() -> None:
     assert summary.crash_rate == 0.5
     assert summary.average_return == 3.0
 
+    partial = summarize_episodes([{}])
+    assert partial.success_rate == 0.0
+    assert partial.average_return == 0.0
+
 
 def test_train_baseline_validates_algorithm_before_import() -> None:
     with pytest.raises(ValueError):

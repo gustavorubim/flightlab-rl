@@ -23,13 +23,18 @@ def main() -> None:
     from flightlab.rl import train_baseline
 
     args = parse_args()
-    result = train_baseline(
-        algorithm=args.algorithm,
-        task=args.task,
-        total_timesteps=args.timesteps,
-        seed=args.seed,
-        verbose=1,
-    )
+    try:
+        result = train_baseline(
+            algorithm=args.algorithm,
+            task=args.task,
+            total_timesteps=args.timesteps,
+            seed=args.seed,
+            verbose=1,
+        )
+    except RuntimeError as exc:
+        raise SystemExit(
+            f"{exc}\nInstall it with: uv pip install -e '.[dev,rl]'"
+        ) from exc
     print(result)
 
 

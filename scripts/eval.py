@@ -65,7 +65,10 @@ def main() -> None:
         _observation, _reward, terminated, truncated, last_info = env.step(action)
         if terminated or truncated:
             break
-    print(last_info.get("episode_summary", {}))
+    summary = last_info.get("episode_summary")
+    if not isinstance(summary, dict):
+        summary = env.episode_summary()
+    print(summary)
 
 
 if __name__ == "__main__":

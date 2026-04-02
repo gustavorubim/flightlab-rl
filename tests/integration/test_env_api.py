@@ -71,3 +71,12 @@ def test_landing_env_reports_touchdown_metrics() -> None:
     touchdown_state = landing.state.__class__(**{**landing.state.__dict__, "on_ground": True})
     evaluation = landing._evaluate(touchdown_state)
     assert evaluation.metrics["touchdown_sink_rate_mps"] == 3.0
+
+
+def test_episode_summary_available_without_terminal_step() -> None:
+    env = make_env("flight_plan", seed=9)
+    env.reset(seed=9)
+    _ = env.step(np.asarray([0.0, 0.0, 0.0, 0.6], dtype=np.float32))
+    summary = env.episode_summary()
+    assert "success" in summary
+    assert "episode_return" in summary
