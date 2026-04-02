@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from flightlab.envs import make_env, register_envs
@@ -80,3 +82,24 @@ def test_episode_summary_available_without_terminal_step() -> None:
     summary = env.episode_summary()
     assert "success" in summary
     assert "episode_return" in summary
+
+
+def test_env_export_video_uses_renderer(monkeypatch, tmp_path) -> None:
+    env = make_env("takeoff", seed=10)
+    env.reset(seed=10)
+    _ = env.step(np.asarray([0.0, 0.0, 0.0, 0.7], dtype=np.float32))
+
+    captured: dict[str, object] = {}
+
+    def fake_render(records, output_path, **kwargs):
+        captured["records"] = records
+        captured["output_path"] = output_path
+        captured["kwargs"] = kwargs
+        return Path(output_path)
+
+    monkeypatch.setattr("flightlab.render.render_episode_video", fake_render)
+    output = env.export_video(str(tmp_path / "takeoff.mp4"), fps=12)
+    assert output.endswith("takeoff.mp4")
+    assert captured["kwargs"]["task_name"] == "takeoff"
+    assert captured["kwargs"]["fps"] == 12
+    assert captured["records"]

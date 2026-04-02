@@ -15,6 +15,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--steps", type=int, default=120)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--video-output")
+    parser.add_argument("--fps", type=int, default=10)
     return parser.parse_args()
 
 
@@ -32,6 +34,8 @@ def main() -> None:
         if terminated or truncated:
             break
     print(env.export_replay(args.output))
+    if args.video_output:
+        print(env.export_video(args.video_output, fps=args.fps))
 
 
 if __name__ == "__main__":

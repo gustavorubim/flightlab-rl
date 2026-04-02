@@ -140,6 +140,16 @@ uv pip install -e '.[dev,rl,sim]'
 
 If you use `zsh`, keep the extras spec quoted like `'.[dev,rl,sim]'` or escape the brackets. Otherwise the shell will try to expand them before `uv` sees the argument.
 
+### Video rendering requirement
+
+MP4 rendering uses `ffmpeg` for encoding. On macOS with Homebrew:
+
+```bash
+brew install ffmpeg
+```
+
+The Python side of the renderer uses Pillow, which is installed with the main package dependencies.
+
 ### Interpreter note
 
 Use the repository virtualenv, not a global Python installation.
@@ -196,6 +206,12 @@ This runs the built-in PID autopilot against one task and prints an episode summ
 
 This is the current built-in “agent evaluation” path that uses an actual controller instead of a fixed action vector.
 
+To render an MP4 of the same rollout:
+
+```bash
+./.venv/bin/python scripts/eval.py --task flight_plan --seed 42 --steps 250 --video-output replays/flight_plan_eval.mp4
+```
+
 ### 3. Play a rollout in the terminal
 
 This prints one compact render line per step:
@@ -216,6 +232,12 @@ This is useful for:
 * checking task phase transitions
 * quickly inspecting whether a policy is obviously unstable
 
+You can also render that rollout directly to video:
+
+```bash
+./.venv/bin/python scripts/play.py --task flight_plan --seed 42 --steps 100 --video-output replays/flight_plan_play.mp4
+```
+
 ### 4. Export a replay
 
 You can export a JSON replay for later analysis:
@@ -235,6 +257,18 @@ Each replay contains:
 * the per-step `info` payload
 
 This is the current best path for offline rendering, plotting, and debugging.
+
+You can export replay JSON and MP4 in one run:
+
+```bash
+./.venv/bin/python scripts/export_replay.py --task takeoff --seed 42 --steps 120 --output replays/takeoff.json --video-output replays/takeoff.mp4
+```
+
+If you already have a replay JSON file, render it later with:
+
+```bash
+./.venv/bin/python scripts/render_replay.py --replay replays/takeoff.json --output replays/takeoff.mp4
+```
 
 ## RL training
 
@@ -287,12 +321,16 @@ If you want persistent checkpoints next, the right place to extend is [baselines
 
 ### Current render path
 
-At the moment, rendering is debug-oriented rather than graphical:
+The repo now supports both live text rendering and MP4 export:
 
 * `env.render()` returns a compact text summary
 * `scripts/play.py` prints those summaries live
 * `scripts/export_replay.py` writes a deterministic JSON replay
-* `src/flightlab/render/replay.py` is the main replay capture/export utility
+* `env.export_video(...)` renders an MP4 rollout video
+* `scripts/eval.py`, `scripts/play.py`, and `scripts/export_replay.py` support `--video-output`
+* `scripts/render_replay.py` converts an existing replay JSON file into an MP4
+* `src/flightlab/render/replay.py` handles replay capture
+* `src/flightlab/render/video.py` handles video frame rendering and ffmpeg encoding
 
 There is not yet a built-in 3D viewer or desktop playback app.
 
@@ -314,6 +352,7 @@ while True:
         break
 
 env.export_replay("replays/flight_plan_agent.json")
+env.export_video("replays/flight_plan_agent.mp4", fps=12)
 ```
 
 That pattern works for any action source:
@@ -331,7 +370,11 @@ The repo already includes one complete controller-driven path:
 ./.venv/bin/python scripts/eval.py --task flight_plan --seed 42 --steps 250
 ```
 
-That runs the PID autopilot and prints the final summary. If you want live per-step traces from the controller rather than the fixed-action `play.py` path, the easiest extension is to adapt [eval.py](/Users/gvrubim/Desktop/omscs/flightlab-rl/scripts/eval.py) so it prints `env.render()` inside the step loop.
+That runs the PID autopilot and prints the final summary. To render a video of the same controller rollout:
+
+```bash
+./.venv/bin/python scripts/eval.py --task flight_plan --seed 42 --steps 250 --video-output replays/flight_plan_pid.mp4
+```
 
 ### Working with replay files
 
@@ -349,6 +392,8 @@ A typical next step is to build a notebook or small viewer that reads `replays/*
 * cross-track error over time
 * control commands over time
 * reward components over time
+
+They can also be converted directly to MP4 with [render_replay.py](/Users/gvrubim/Desktop/omscs/flightlab-rl/scripts/render_replay.py).
 
 ## Programmatic use
 

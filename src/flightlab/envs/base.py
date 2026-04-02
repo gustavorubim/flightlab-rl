@@ -133,6 +133,34 @@ class BaseFlightEnv(gym.Env[np.ndarray, np.ndarray], ABC):
         """Export the current episode replay to JSON."""
         return str(self._recorder.export_json(path))
 
+    def replay_records(self) -> list[dict[str, Any]]:
+        """Return the current replay records."""
+        return self._recorder.as_list()
+
+    def export_video(
+        self,
+        path: str,
+        *,
+        fps: int = 10,
+        width: int = 1280,
+        height: int = 720,
+        title: str | None = None,
+    ) -> str:
+        """Render the current replay to an MP4 video."""
+        from flightlab.render import render_episode_video
+
+        return str(
+            render_episode_video(
+                self.replay_records(),
+                path,
+                task_name=self.task_name,
+                title=title,
+                fps=fps,
+                width=width,
+                height=height,
+            )
+        )
+
     def episode_summary(self, *, success: bool | None = None) -> dict[str, float | bool]:
         """Return a benchmark-friendly summary for the current episode state."""
         effective_success = (
@@ -165,6 +193,7 @@ class BaseFlightEnv(gym.Env[np.ndarray, np.ndarray], ABC):
     def _build_info(self, evaluation: TaskEvaluation) -> dict[str, Any]:
         """Build the standardized info dictionary."""
         info = {
+            "task_name": self.task_name,
             "reward": evaluation.reward,
             "reward_breakdown": dict(evaluation.reward_breakdown),
             "task_phase": evaluation.phase,

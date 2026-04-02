@@ -6,7 +6,7 @@ import pytest
 
 from flightlab.controllers.pid import PIDAutopilot, PIDController
 from flightlab.metrics import summarize_episodes
-from flightlab.rl.baselines import TrainingResult, train_baseline
+from flightlab.rl.baselines import TrainingResult, load_model_class, train_baseline
 
 
 def test_pid_controller_and_autopilot(make_state) -> None:
@@ -83,11 +83,38 @@ def test_train_baseline_uses_fake_sb3(monkeypatch) -> None:
         def learn(self, total_timesteps: int) -> None:
             self.total_timesteps = total_timesteps
 
+        def save(self, path: str) -> None:
+            self.saved_path = path
+
     monkeypatch.setattr(
         "flightlab.rl.baselines._load_sb3",
         lambda: (FakeModel, FakeModel),
     )
-    result = train_baseline(algorithm="ppo", task="takeoff", total_timesteps=12, seed=3)
+    result = train_baseline(
+        algorithm="ppo",
+        task="takeoff",
+        total_timesteps=12,
+        seed=3,
+        output_path="artifacts/fake_model",
+    )
     assert isinstance(result, TrainingResult)
     assert result.model_class_name == "FakeModel"
     assert result.total_timesteps == 12
+    assert result.output_path == "artifacts/fake_model"
+
+
+def test_load_model_class_validates_algorithm(monkeypatch) -> None:
+    @dataclass
+    class FakeModel:
+        policy: str
+        env: object
+        seed: int
+        verbose: int
+
+    monkeypatch.setattr(
+        "flightlab.rl.baselines._load_sb3",
+        lambda: (FakeModel, FakeModel),
+    )
+    assert load_model_class("ppo") is FakeModel
+    with pytest.raises(ValueError):
+        load_model_class("bad")

@@ -14,6 +14,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task", choices=("flight_plan", "takeoff", "landing"), required=True)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--steps", type=int, default=100)
+    parser.add_argument("--video-output")
+    parser.add_argument("--fps", type=int, default=10)
     return parser.parse_args()
 
 
@@ -31,6 +33,8 @@ def main() -> None:
         print(env.render())
         if terminated or truncated:
             break
+    if args.video_output:
+        print(env.export_video(args.video_output, fps=args.fps))
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task", choices=("flight_plan", "takeoff", "landing"), required=True)
     parser.add_argument("--timesteps", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--output")
     return parser.parse_args()
 
 
@@ -30,6 +31,7 @@ def main() -> None:
             total_timesteps=args.timesteps,
             seed=args.seed,
             verbose=1,
+            output_path=args.output,
         )
     except RuntimeError as exc:
         raise SystemExit(

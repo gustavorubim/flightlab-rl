@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import json
+from pathlib import Path
 
 import pytest
 
@@ -9,6 +11,7 @@ from flightlab.dynamics.base import DynamicsConfig
 from flightlab.dynamics.jsbsim_adapter import JSBSimDynamics
 from flightlab.dynamics.kinematic import KinematicDynamics
 from flightlab.render.replay import EpisodeRecorder
+from flightlab.render.video import render_episode_video
 from flightlab.sensors.observation import ObservationBuilder
 
 
@@ -56,7 +59,8 @@ def test_kinematic_dynamics_requires_reset() -> None:
         raise AssertionError("Expected RuntimeError")
 
 
-def test_jsbsim_adapter_raises_when_optional_dependency_missing() -> None:
+def test_jsbsim_adapter_raises_when_optional_dependency_missing(monkeypatch) -> None:
+    monkeypatch.setattr("flightlab.dynamics.jsbsim_adapter.jsbsim", None)
     try:
         JSBSimDynamics()
     except RuntimeError as exc:
@@ -74,3 +78,57 @@ def test_episode_recorder_exports_json(tmp_path, make_state) -> None:
     payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload[0]["kind"] == "reset"
     assert payload[1]["reward"] == 1.0
+
+
+def test_render_episode_video_uses_ffmpeg(monkeypatch, tmp_path, make_state) -> None:
+    recorder = EpisodeRecorder()
+    state = make_state()
+    recorder.record_reset(state, {"task_phase": "RESET", "task_name": "takeoff"})
+    recorder.record_step(
+        make_state(position_x_m=10.0, position_y_m=5.0, heading_rad=0.2),
+        [0.1, 0.0, 0.0, 0.8],
+        0.5,
+        {"task_phase": "TAKEOFF_ROLL", "task_name": "takeoff", "reward": 0.5},
+    )
+
+    class FakeProcess:
+        def __init__(self, command):
+            class FakeStdin(io.BytesIO):
+                def close(self) -> None:
+                    self.flush()
+
+            self.command = command
+            self.stdin = FakeStdin()
+            self.stderr = io.BytesIO()
+            self._output_path = Path(command[-1])
+
+        def wait(self) -> int:
+            self._output_path.write_bytes(b"fake-mp4")
+            return 0
+
+    fake_processes: list[FakeProcess] = []
+
+    def fake_popen(command, stdin, stdout, stderr):
+        process = FakeProcess(command)
+        fake_processes.append(process)
+        return process
+
+    monkeypatch.setattr("flightlab.render.video.shutil.which", lambda name: "/usr/bin/ffmpeg")
+    monkeypatch.setattr("flightlab.render.video.subprocess.Popen", fake_popen)
+    output_path = render_episode_video(
+        recorder.as_list(),
+        tmp_path / "rollout.mp4",
+        task_name="takeoff",
+    )
+    assert output_path.exists()
+    assert output_path.read_bytes() == b"fake-mp4"
+    assert fake_processes
+    assert len(fake_processes[0].stdin.getvalue()) > 0
+
+
+def test_render_episode_video_requires_ffmpeg(monkeypatch, make_state) -> None:
+    recorder = EpisodeRecorder()
+    recorder.record_reset(make_state(), {"task_phase": "RESET"})
+    monkeypatch.setattr("flightlab.render.video.shutil.which", lambda name: None)
+    with pytest.raises(RuntimeError):
+        render_episode_video(recorder.as_list(), "ignored.mp4")
