@@ -48,6 +48,23 @@ def test_takeoff_detects_excursion_and_stall(make_state) -> None:
     assert evaluation.safety_flags["stall"] is True
 
 
+def test_takeoff_fails_grounded_overspeed_without_liftoff(make_state) -> None:
+    runway = Runway(name="09", length_m=900.0, width_m=30.0, heading_rad=0.0, elevation_m=120.0)
+    state = make_state(
+        altitude_m=120.0,
+        airspeed_mps=29.0,
+        groundspeed_mps=29.0,
+        pitch_rad=0.02,
+        vertical_speed_mps=0.0,
+        on_ground=True,
+    )
+    evaluation = evaluate_takeoff(state, runway, TakeoffTaskConfig())
+    assert evaluation.terminated is True
+    assert evaluation.safety_flags["failed_liftoff"] is True
+    assert evaluation.reward_breakdown["delayed_rotation"] < 0.0
+    assert evaluation.reward < 0.0
+
+
 def test_landing_phase_rewards_and_hard_landing(make_state) -> None:
     runway = Runway(name="27", length_m=900.0, width_m=30.0, heading_rad=0.0, elevation_m=120.0)
     approach_state = make_state(position_x_m=-400.0, altitude_m=145.0, airspeed_mps=25.0)
