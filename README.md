@@ -96,6 +96,19 @@ This avoids leaking in Conda or system packages and keeps the behavior reproduci
 | Train with reward logging and plots | `./.venv/bin/python scripts/train.py --algorithm sac --task takeoff --timesteps 120000 --seed 42 --output artifacts/takeoff_sac_seed42 --log-dir artifacts/training_plots/sac_takeoff_seed42 --plot-training --eval-episodes 10` |
 | Render a trained checkpoint | `./.venv/bin/python scripts/render_policy.py --algorithm ppo --task takeoff --model artifacts/ppo_takeoff_seed42_v3 --seed 42 --steps 400 --video-output replays/takeoff_ppo_seed42_v3.mp4` |
 
+## Mission Control App
+
+A live local mission-control product now lives in [`apps/mission-control`](apps/mission-control). It provides a FastAPI real-time session backend plus a React + Three.js operator console for runway-ready launch, live telemetry, and in-flight route edits.
+
+Quick start:
+
+```bash
+cd apps/mission-control
+docker compose up --build
+```
+
+Or run the services directly with the repo virtualenv and `npm`. Full setup, controller registry, checkpoints, and local dev details are documented in [`apps/mission-control/README.md`](apps/mission-control/README.md).
+
 ## Architecture Overview
 
 ### Modularization Diagram

@@ -1,0 +1,19 @@
+version: 1
+defaults:
+  controller_mode: pid
+  sim_backend: kinematic
+controllers:
+  pid:
+    kind: classical
+    display_name: "PID / Red Cell"
+    description: "Deterministic classical controller using the existing PIDAutopilot baseline."
+    module: flightlab.controllers:PIDAutopilot
+  rl_phase_switched:
+    kind: rl_phase_switched
+    display_name: "RL / Black Cell"
+    description: "Phase-switched RL control using task-specific PPO checkpoints."
+    takeoff_model_path: ../../../artifacts/ppo_takeoff_seed42_v3.zip
+    flight_plan_model_path: ../../../artifacts/ppo_flight_plan_seed42.zip
+    takeoff_algorithm: ppo
+    flight_plan_algorithm: ppo
+

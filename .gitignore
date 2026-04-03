@@ -25,7 +25,11 @@ build/
 *.swo
 *.bak
 *.tmp
+node_modules/
+*.tsbuildinfo
 *.zip
 *.tar.gz
 *.egg-info/
 replays/
+apps/mission-control/web/vite.config.js
+apps/mission-control/web/vite.config.d.ts

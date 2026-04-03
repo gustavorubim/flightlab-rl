@@ -1,0 +1,35 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/mission-control/api/Dockerfile
+    environment:
+      MISSION_CONTROL_CONTROLLER_REGISTRY: /workspace/apps/mission-control/config/controllers.yaml
+      PYTHONPATH: /workspace/src
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace/apps/mission-control/api
+    command:
+      - sh
+      - -lc
+      - exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/mission-control/web/Dockerfile
+    environment:
+      VITE_MISSION_CONTROL_API_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace/apps/mission-control/web
+    depends_on:
+      - api
+    command:
+      - sh
+      - -lc
+      - npm install && npm run dev -- --host 0.0.0.0 --port 5173

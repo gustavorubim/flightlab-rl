@@ -1,0 +1,164 @@
+import { useEffect, useMemo, useState } from 'react';
+
+import { MissionControlDashboard } from '@/components/MissionControlDashboard';
+import {
+  createDefaultMissionDraft,
+  createWaypointDraft,
+  deleteMissionWaypoint,
+  missionToPayload,
+  moveMissionWaypoint,
+  normalizeControllerMode,
+  reorderMissionWaypoint,
+  updateMissionWaypoint,
+} from '@/lib/mission';
+import { useMissionControl } from '@/hooks/useMissionControl';
+import type { ControllerMode, MissionDraft, MissionWaypoint } from '@/types';
+
+type CameraMode = 'orbit' | 'chase';
+
+function createMissionWaypointWithIndex(
+  coords: Pick<MissionWaypoint, 'x_m' | 'y_m'>,
+  index: number,
+): MissionWaypoint {
+  return createWaypointDraft(index, coords);
+}
+
+export function App() {
+  const {
+    snapshot,
+    controllers,
+    connectionStatus,
+    lastUpdatedAt,
+    error,
+    startSession,
+    resetSession,
+    takeoff,
+    pause,
+    resume,
+    commitMission,
+  } = useMissionControl();
+
+  const [selectedControllerMode, setSelectedControllerMode] = useState<ControllerMode>('pid');
+  const [mission, setMission] = useState<MissionDraft>(createDefaultMissionDraft());
+  const [selectedWaypointId, setSelectedWaypointId] = useState<string | null>(
+    mission.waypoints[0]?.id ?? null,
+  );
+  const [cameraMode, setCameraMode] = useState<CameraMode>('orbit');
+  const [hasUnsavedRoute, setHasUnsavedRoute] = useState(false);
+
+  useEffect(() => {
+    const mode = normalizeControllerMode(snapshot.session.controller_mode);
+    setSelectedControllerMode(mode);
+
+    if (!hasUnsavedRoute) {
+      const normalized = {
+        name: snapshot.mission.name,
+        waypoints: snapshot.mission.waypoints.map((waypoint, index) => ({
+          id: waypoint.id ?? `snapshot-${index}`,
+          name: waypoint.name,
+          x_m: waypoint.x_m,
+          y_m: waypoint.y_m,
+          altitude_m: waypoint.altitude_m,
+          target_airspeed_mps: waypoint.target_airspeed_mps,
+          acceptance_radius_m: waypoint.acceptance_radius_m,
+        })),
+      } satisfies MissionDraft;
+      setMission(normalized);
+      setSelectedWaypointId(
+        (current: string | null) => current ?? normalized.waypoints[0]?.id ?? null,
+      );
+    }
+  }, [hasUnsavedRoute, snapshot.mission, snapshot.session.controller_mode]);
+
+  const controllerOptions = useMemo(
+    () => (controllers.length > 0 ? controllers : []),
+    [controllers],
+  );
+
+  async function handleStartSession() {
+    await startSession({
+      controllerMode: selectedControllerMode,
+      mission: missionToPayload(mission),
+    });
+    setHasUnsavedRoute(false);
+  }
+
+  async function handleResetSession() {
+    await resetSession();
+    const nextMission = createDefaultMissionDraft();
+    setMission(nextMission);
+    setSelectedWaypointId(nextMission.waypoints[0]?.id ?? null);
+    setHasUnsavedRoute(false);
+  }
+
+  async function handleCommitRoute() {
+    await commitMission(missionToPayload(mission));
+    setHasUnsavedRoute(false);
+  }
+
+  function handleAddWaypoint(coords: Pick<MissionWaypoint, 'x_m' | 'y_m'>): string {
+    const waypoint = createMissionWaypointWithIndex(coords, mission.waypoints.length);
+    setMission((current) => ({
+      ...current,
+      waypoints: [...current.waypoints, waypoint],
+    }));
+    setSelectedWaypointId(waypoint.id);
+    setHasUnsavedRoute(true);
+    return waypoint.id;
+  }
+
+  function handleMoveWaypoint(waypointId: string, coords: Pick<MissionWaypoint, 'x_m' | 'y_m'>) {
+    setMission((current: MissionDraft) => moveMissionWaypoint(current, waypointId, coords));
+    setHasUnsavedRoute(true);
+  }
+
+  function handleUpdateWaypoint(
+    waypointId: string,
+    changes: Partial<Omit<MissionWaypoint, 'id'>>,
+  ) {
+    setMission((current: MissionDraft) => updateMissionWaypoint(current, waypointId, changes));
+    setHasUnsavedRoute(true);
+  }
+
+  function handleReorderWaypoint(waypointId: string, direction: -1 | 1) {
+    setMission((current: MissionDraft) => reorderMissionWaypoint(current, waypointId, direction));
+    setHasUnsavedRoute(true);
+  }
+
+  function handleDeleteWaypoint(waypointId: string) {
+    setMission((current: MissionDraft) => deleteMissionWaypoint(current, waypointId));
+    setSelectedWaypointId((current: string | null) => (current === waypointId ? null : current));
+    setHasUnsavedRoute(true);
+  }
+
+  return (
+    <MissionControlDashboard
+      snapshot={snapshot}
+      controllers={controllerOptions}
+      connectionStatus={connectionStatus}
+      lastUpdatedAt={lastUpdatedAt}
+      error={error}
+      selectedControllerMode={selectedControllerMode}
+      onSelectedControllerModeChange={setSelectedControllerMode}
+      mission={mission}
+      selectedWaypointId={selectedWaypointId}
+      onSelectWaypoint={setSelectedWaypointId}
+      onAddWaypoint={handleAddWaypoint}
+      onMoveWaypoint={handleMoveWaypoint}
+      onUpdateWaypoint={handleUpdateWaypoint}
+      onReorderWaypoint={handleReorderWaypoint}
+      onDeleteWaypoint={handleDeleteWaypoint}
+      onCommitRoute={handleCommitRoute}
+      onStartSession={handleStartSession}
+      onResetSession={handleResetSession}
+      onTakeoff={takeoff}
+      onPause={pause}
+      onResume={resume}
+      hasUnsavedRoute={hasUnsavedRoute}
+      cameraMode={cameraMode}
+      onCameraModeChange={setCameraMode}
+    />
+  );
+}
+
+export default App;
