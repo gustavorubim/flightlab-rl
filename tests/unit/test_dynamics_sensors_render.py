@@ -11,7 +11,13 @@ from flightlab.dynamics.base import DynamicsConfig
 from flightlab.dynamics.jsbsim_adapter import JSBSimDynamics
 from flightlab.dynamics.kinematic import KinematicDynamics
 from flightlab.render.replay import EpisodeRecorder
-from flightlab.render.video import render_episode_video
+from flightlab.render.video import (
+    _build_camera,
+    _prepare_frame,
+    _project_world_point,
+    _scene_bounds,
+    render_episode_video,
+)
 from flightlab.sensors.observation import ObservationBuilder
 
 
@@ -132,3 +138,65 @@ def test_render_episode_video_requires_ffmpeg(monkeypatch, make_state) -> None:
     monkeypatch.setattr("flightlab.render.video.shutil.which", lambda name: None)
     with pytest.raises(RuntimeError):
         render_episode_video(recorder.as_list(), "ignored.mp4")
+
+
+def test_video_projection_places_aircraft_inside_view() -> None:
+    frames = [
+        _prepare_frame(
+            {
+                "state": {
+                    "position_x_m": 0.0,
+                    "position_y_m": 0.0,
+                    "altitude_m": 120.0,
+                    "roll_rad": 0.05,
+                    "pitch_rad": 0.08,
+                    "heading_rad": 0.3,
+                    "airspeed_mps": 30.0,
+                    "groundspeed_mps": 28.0,
+                    "vertical_speed_mps": 2.0,
+                    "time_s": 0.0,
+                    "on_ground": False,
+                    "throttle": 0.8,
+                    "elevator": 0.1,
+                    "aileron": -0.1,
+                    "rudder": 0.02,
+                },
+                "info": {"task_phase": "CLIMB", "task_name": "takeoff"},
+            }
+        ),
+        _prepare_frame(
+            {
+                "state": {
+                    "position_x_m": 220.0,
+                    "position_y_m": 110.0,
+                    "altitude_m": 180.0,
+                    "roll_rad": 0.04,
+                    "pitch_rad": 0.07,
+                    "heading_rad": 0.45,
+                    "airspeed_mps": 33.0,
+                    "groundspeed_mps": 31.0,
+                    "vertical_speed_mps": 3.0,
+                    "time_s": 12.0,
+                    "on_ground": False,
+                    "throttle": 0.9,
+                    "elevator": 0.05,
+                    "aileron": 0.03,
+                    "rudder": 0.01,
+                },
+                "info": {"task_phase": "CLIMB", "task_name": "takeoff"},
+            }
+        ),
+    ]
+    rect = (0, 0, 800, 600)
+    bounds = _scene_bounds(frames)
+    camera = _build_camera(bounds, rect=rect)
+    projected = _project_world_point(
+        (frames[1]["x_m"], frames[1]["y_m"], frames[1]["altitude_m"]),
+        camera=camera,
+        rect=rect,
+    )
+    assert projected is not None
+    x_px, y_px, depth = projected
+    assert 0.0 <= x_px <= 800.0
+    assert 0.0 <= y_px <= 600.0
+    assert depth > 0.0
