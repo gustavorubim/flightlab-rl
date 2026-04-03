@@ -15,6 +15,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timesteps", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output")
+    parser.add_argument("--log-dir")
+    parser.add_argument("--plot-training", action="store_true")
+    parser.add_argument("--eval-episodes", type=int, default=0)
     return parser.parse_args()
 
 
@@ -32,6 +35,9 @@ def main() -> None:
             seed=args.seed,
             verbose=1,
             output_path=args.output,
+            log_dir=args.log_dir,
+            plot_training=args.plot_training,
+            evaluation_episodes=args.eval_episodes,
         )
     except RuntimeError as exc:
         raise SystemExit(

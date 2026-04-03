@@ -1,0 +1,17 @@
+{
+  "task": "landing",
+  "algorithm": "sac",
+  "seed": 42,
+  "timesteps": 122932,
+  "episodes_logged": 793,
+  "final_episode_return": 38.740094,
+  "best_episode_return": 47.076129,
+  "mean_episode_return": -8.093434931904161,
+  "final_window_return": 40.36430155999995,
+  "final_window_success_rate": 0.0,
+  "evaluation": {},
+  "model_path": null,
+  "monitor_path": "artifacts/training_plots/sac_seed42/landing/monitor.csv",
+  "plot_path": "artifacts/training_plots/sac_seed42/landing/training_partial.png",
+  "interrupted": true
+}

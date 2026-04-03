@@ -93,6 +93,7 @@ This avoids leaking in Conda or system packages and keeps the behavior reproduci
 | Export replay JSON | `./.venv/bin/python scripts/export_replay.py --task landing --seed 42 --steps 180 --output replays/landing.json` |
 | Render replay JSON to MP4 | `./.venv/bin/python scripts/render_replay.py --replay replays/landing.json --output replays/landing.mp4` |
 | Train an RL policy | `./.venv/bin/python scripts/train.py --algorithm ppo --task flight_plan --timesteps 300000 --seed 42 --output artifacts/ppo_flight_plan_seed42` |
+| Train with reward logging and plots | `./.venv/bin/python scripts/train.py --algorithm sac --task takeoff --timesteps 120000 --seed 42 --output artifacts/takeoff_sac_seed42 --log-dir artifacts/training_plots/sac_takeoff_seed42 --plot-training --eval-episodes 10` |
 | Render a trained checkpoint | `./.venv/bin/python scripts/render_policy.py --algorithm ppo --task takeoff --model artifacts/ppo_takeoff_seed42_v3 --seed 42 --steps 400 --video-output replays/takeoff_ppo_seed42_v3.mp4` |
 
 ## Architecture Overview
@@ -213,6 +214,34 @@ The action vector is always 4-dimensional and normalized:
 ### Observation Space
 
 The default observation vector is 25-dimensional.
+
+## RL Training Artifacts
+
+`scripts/train.py` can now write structured training artifacts directly from the main training path instead of requiring ad hoc notebook code.
+
+Example:
+
+```bash
+./.venv/bin/python scripts/train.py \
+  --algorithm ppo \
+  --task flight_plan \
+  --timesteps 300000 \
+  --seed 42 \
+  --output artifacts/ppo_flight_plan_seed42 \
+  --log-dir artifacts/training_plots/ppo_flight_plan_seed42 \
+  --plot-training \
+  --eval-episodes 10
+```
+
+When `--log-dir` is provided, the training run writes:
+
+- `monitor.csv`: Stable-Baselines3 monitor log with episode reward and length
+- `summary.json`: compact run summary with final reward statistics and optional deterministic evaluation metrics
+- `training.png`: reward-per-episode and moving-average plots when `--plot-training` is enabled
+
+If `--plot-training` or `--eval-episodes` is used without `--log-dir`, the trainer derives a default artifact directory under `artifacts/`.
+
+This makes it straightforward to compare PPO and SAC using the same task, seed, and logging format.
 
 Base dynamic features:
 

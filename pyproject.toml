@@ -27,6 +27,7 @@ sim = [
   "jsbsim>=1.2.3",
 ]
 rl = [
+  "matplotlib>=3.10.0",
   "stable-baselines3>=2.5.0",
 ]
 

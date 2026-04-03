@@ -1,0 +1,59 @@
+{
+  "takeoff": {
+    "task": "takeoff",
+    "algorithm": "sac",
+    "seed": 42,
+    "timesteps": 120000,
+    "episodes_logged": 427,
+    "final_episode_return": 74.613342,
+    "best_episode_return": 151.601835,
+    "mean_episode_return": 68.08159037470726,
+    "final_window_return": 56.58329880000063,
+    "final_window_success_rate": 0.28,
+    "evaluation": {
+      "average_return": 67.4726723990971,
+      "success_rate": 1.0,
+      "average_completion_time_s": 13.689999999999966
+    },
+    "model_path": "artifacts/training_plots/sac_seed42/takeoff/takeoff_sac_seed42",
+    "monitor_path": "artifacts/training_plots/sac_seed42/takeoff/monitor.csv",
+    "plot_path": "artifacts/training_plots/sac_seed42/takeoff/training.png"
+  },
+  "flight_plan": {
+    "task": "flight_plan",
+    "algorithm": "sac",
+    "seed": 42,
+    "timesteps": 300000,
+    "episodes_logged": 666,
+    "final_episode_return": 242.06329,
+    "best_episode_return": 263.510915,
+    "mean_episode_return": 185.22125875225223,
+    "final_window_return": 249.99518740000028,
+    "final_window_success_rate": 0.0,
+    "evaluation": {
+      "average_return": 241.4046907448228,
+      "success_rate": 0.0,
+      "average_completion_time_s": 50.00000000000044
+    },
+    "model_path": "artifacts/training_plots/sac_seed42/flight_plan/flight_plan_sac_seed42",
+    "monitor_path": "artifacts/training_plots/sac_seed42/flight_plan/monitor.csv",
+    "plot_path": "artifacts/training_plots/sac_seed42/flight_plan/training.png"
+  },
+  "landing_partial": {
+    "task": "landing",
+    "algorithm": "sac",
+    "seed": 42,
+    "timesteps": 122932,
+    "episodes_logged": 793,
+    "final_episode_return": 38.740094,
+    "best_episode_return": 47.076129,
+    "mean_episode_return": -8.093434931904161,
+    "final_window_return": 40.36430155999995,
+    "final_window_success_rate": 0.0,
+    "evaluation": {},
+    "model_path": null,
+    "monitor_path": "artifacts/training_plots/sac_seed42/landing/monitor.csv",
+    "plot_path": "artifacts/training_plots/sac_seed42/landing/training_partial.png",
+    "interrupted": true
+  }
+}

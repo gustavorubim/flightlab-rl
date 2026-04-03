@@ -1,0 +1,20 @@
+{
+  "task": "takeoff",
+  "algorithm": "ppo",
+  "seed": 42,
+  "timesteps": 120000,
+  "episodes_logged": 1081,
+  "final_episode_return": 35.889087,
+  "best_episode_return": 74.251509,
+  "mean_episode_return": 7.071277230342274,
+  "final_25_episode_return": 16.8546684,
+  "final_25_episode_success_rate": 0.0,
+  "evaluation": {
+    "average_return": 26.580754005170697,
+    "success_rate": 0.2,
+    "average_completion_time_s": 10.159999999999979
+  },
+  "model_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42.zip",
+  "monitor_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42.monitor.csv",
+  "plot_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42_training.png"
+}

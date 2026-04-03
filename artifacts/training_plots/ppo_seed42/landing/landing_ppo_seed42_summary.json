@@ -1,0 +1,20 @@
+{
+  "task": "landing",
+  "algorithm": "ppo",
+  "seed": 42,
+  "timesteps": 300000,
+  "episodes_logged": 2907,
+  "final_episode_return": -31.411572,
+  "best_episode_return": 39.688365,
+  "mean_episode_return": -18.774359242862054,
+  "final_25_episode_return": -4.34678568,
+  "final_25_episode_success_rate": 0.0,
+  "evaluation": {
+    "average_return": -5.987922525821195,
+    "success_rate": 0.0,
+    "average_completion_time_s": 12.66999999999997
+  },
+  "model_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42.zip",
+  "monitor_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42.monitor.csv",
+  "plot_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42_training.png"
+}

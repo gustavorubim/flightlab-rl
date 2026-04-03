@@ -1,0 +1,20 @@
+{
+  "task": "flight_plan",
+  "algorithm": "ppo",
+  "seed": 42,
+  "timesteps": 300000,
+  "episodes_logged": 657,
+  "final_episode_return": 147.020098,
+  "best_episode_return": 153.768823,
+  "mean_episode_return": -30.54987032115677,
+  "final_25_episode_return": 40.31472932,
+  "final_25_episode_success_rate": 0.4,
+  "evaluation": {
+    "average_return": 137.53601636824618,
+    "success_rate": 0.4,
+    "average_completion_time_s": 38.59000000000028
+  },
+  "model_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42.zip",
+  "monitor_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42.monitor.csv",
+  "plot_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42_training.png"
+}

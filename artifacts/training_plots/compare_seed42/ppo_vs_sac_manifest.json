@@ -1,0 +1,125 @@
+{
+  "takeoff": {
+    "ppo": {
+      "task": "takeoff",
+      "algorithm": "ppo",
+      "seed": 42,
+      "timesteps": 120000,
+      "episodes_logged": 1081,
+      "final_episode_return": 35.889087,
+      "best_episode_return": 74.251509,
+      "mean_episode_return": 7.071277230342274,
+      "final_25_episode_return": 16.8546684,
+      "final_25_episode_success_rate": 0.0,
+      "evaluation": {
+        "average_return": 26.580754005170697,
+        "success_rate": 0.2,
+        "average_completion_time_s": 10.159999999999979
+      },
+      "model_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42.zip",
+      "monitor_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42.monitor.csv",
+      "plot_path": "artifacts/training_plots/ppo_seed42/takeoff/takeoff_ppo_seed42_training.png"
+    },
+    "sac": {
+      "task": "takeoff",
+      "algorithm": "sac",
+      "seed": 42,
+      "timesteps": 120000,
+      "episodes_logged": 427,
+      "final_episode_return": 74.613342,
+      "best_episode_return": 151.601835,
+      "mean_episode_return": 68.08159037470726,
+      "final_window_return": 56.58329880000063,
+      "final_window_success_rate": 0.28,
+      "evaluation": {
+        "average_return": 67.4726723990971,
+        "success_rate": 1.0,
+        "average_completion_time_s": 13.689999999999966
+      },
+      "model_path": "artifacts/training_plots/sac_seed42/takeoff/takeoff_sac_seed42",
+      "monitor_path": "artifacts/training_plots/sac_seed42/takeoff/monitor.csv",
+      "plot_path": "artifacts/training_plots/sac_seed42/takeoff/training.png"
+    }
+  },
+  "flight_plan": {
+    "ppo": {
+      "task": "flight_plan",
+      "algorithm": "ppo",
+      "seed": 42,
+      "timesteps": 300000,
+      "episodes_logged": 657,
+      "final_episode_return": 147.020098,
+      "best_episode_return": 153.768823,
+      "mean_episode_return": -30.54987032115677,
+      "final_25_episode_return": 40.31472932,
+      "final_25_episode_success_rate": 0.4,
+      "evaluation": {
+        "average_return": 137.53601636824618,
+        "success_rate": 0.4,
+        "average_completion_time_s": 38.59000000000028
+      },
+      "model_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42.zip",
+      "monitor_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42.monitor.csv",
+      "plot_path": "artifacts/training_plots/ppo_seed42/flight_plan/flight_plan_ppo_seed42_training.png"
+    },
+    "sac": {
+      "task": "flight_plan",
+      "algorithm": "sac",
+      "seed": 42,
+      "timesteps": 300000,
+      "episodes_logged": 666,
+      "final_episode_return": 242.06329,
+      "best_episode_return": 263.510915,
+      "mean_episode_return": 185.22125875225223,
+      "final_window_return": 249.99518740000028,
+      "final_window_success_rate": 0.0,
+      "evaluation": {
+        "average_return": 241.4046907448228,
+        "success_rate": 0.0,
+        "average_completion_time_s": 50.00000000000044
+      },
+      "model_path": "artifacts/training_plots/sac_seed42/flight_plan/flight_plan_sac_seed42",
+      "monitor_path": "artifacts/training_plots/sac_seed42/flight_plan/monitor.csv",
+      "plot_path": "artifacts/training_plots/sac_seed42/flight_plan/training.png"
+    }
+  },
+  "landing": {
+    "ppo": {
+      "task": "landing",
+      "algorithm": "ppo",
+      "seed": 42,
+      "timesteps": 300000,
+      "episodes_logged": 2907,
+      "final_episode_return": -31.411572,
+      "best_episode_return": 39.688365,
+      "mean_episode_return": -18.774359242862054,
+      "final_25_episode_return": -4.34678568,
+      "final_25_episode_success_rate": 0.0,
+      "evaluation": {
+        "average_return": -5.987922525821195,
+        "success_rate": 0.0,
+        "average_completion_time_s": 12.66999999999997
+      },
+      "model_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42.zip",
+      "monitor_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42.monitor.csv",
+      "plot_path": "artifacts/training_plots/ppo_seed42/landing/landing_ppo_seed42_training.png"
+    },
+    "sac": {
+      "task": "landing",
+      "algorithm": "sac",
+      "seed": 42,
+      "timesteps": 122932,
+      "episodes_logged": 793,
+      "final_episode_return": 38.740094,
+      "best_episode_return": 47.076129,
+      "mean_episode_return": -8.093434931904161,
+      "final_window_return": 40.36430155999995,
+      "final_window_success_rate": 0.0,
+      "evaluation": {},
+      "model_path": null,
+      "monitor_path": "artifacts/training_plots/sac_seed42/landing/monitor.csv",
+      "plot_path": "artifacts/training_plots/sac_seed42/landing/training_partial.png",
+      "interrupted": true
+    }
+  }
+}

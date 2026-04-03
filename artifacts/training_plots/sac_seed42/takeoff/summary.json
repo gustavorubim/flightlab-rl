@@ -1,0 +1,20 @@
+{
+  "task": "takeoff",
+  "algorithm": "sac",
+  "seed": 42,
+  "timesteps": 120000,
+  "episodes_logged": 427,
+  "final_episode_return": 74.613342,
+  "best_episode_return": 151.601835,
+  "mean_episode_return": 68.08159037470726,
+  "final_window_return": 56.58329880000063,
+  "final_window_success_rate": 0.28,
+  "evaluation": {
+    "average_return": 67.4726723990971,
+    "success_rate": 1.0,
+    "average_completion_time_s": 13.689999999999966
+  },
+  "model_path": "artifacts/training_plots/sac_seed42/takeoff/takeoff_sac_seed42",
+  "monitor_path": "artifacts/training_plots/sac_seed42/takeoff/monitor.csv",
+  "plot_path": "artifacts/training_plots/sac_seed42/takeoff/training.png"
+}

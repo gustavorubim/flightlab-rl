@@ -1,0 +1,20 @@
+{
+  "task": "flight_plan",
+  "algorithm": "sac",
+  "seed": 42,
+  "timesteps": 300000,
+  "episodes_logged": 666,
+  "final_episode_return": 242.06329,
+  "best_episode_return": 263.510915,
+  "mean_episode_return": 185.22125875225223,
+  "final_window_return": 249.99518740000028,
+  "final_window_success_rate": 0.0,
+  "evaluation": {
+    "average_return": 241.4046907448228,
+    "success_rate": 0.0,
+    "average_completion_time_s": 50.00000000000044
+  },
+  "model_path": "artifacts/training_plots/sac_seed42/flight_plan/flight_plan_sac_seed42",
+  "monitor_path": "artifacts/training_plots/sac_seed42/flight_plan/monitor.csv",
+  "plot_path": "artifacts/training_plots/sac_seed42/flight_plan/training.png"
+}
