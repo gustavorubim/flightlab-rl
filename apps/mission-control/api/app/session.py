@@ -13,7 +13,7 @@ from uuid import uuid4
 from fastapi import HTTPException
 
 from app.config import ControllerRegistry
-from app.controllers import PIDMissionPilot, RLPhaseSwitchedPilot
+from app.controllers import PIDMissionPilot, RLPhaseSwitchedPilot, rl_dependencies_available
 from app.schemas import (
     AircraftTelemetryModel,
     CommandResponseModel,
@@ -92,6 +92,7 @@ class MissionRuntimeService:
     ) -> None:
         self._registry_path = Path(controller_registry_path)
         self._registry = ControllerRegistry.from_path(self._registry_path)
+        self._rl_runtime_available = rl_dependencies_available()
         self._tick_interval_s = 1.0 / tick_hz
         self._trail_points = trail_points
         self._lock = asyncio.Lock()
@@ -132,6 +133,15 @@ class MissionRuntimeService:
 
     async def list_controllers(self) -> list[ControllerOptionModel]:
         """Return the controller modes visible to the frontend."""
+        rl_available = self._registry.rl_phase_switched.available and self._rl_runtime_available
+        rl_details = {
+            "takeoff": self._registry.rl_phase_switched.takeoff.label,
+            "flight_plan": self._registry.rl_phase_switched.flight_plan.label,
+        }
+        if not self._registry.rl_phase_switched.available:
+            rl_details["status"] = "Missing one or more configured checkpoints."
+        elif not self._rl_runtime_available:
+            rl_details["status"] = "Stable-Baselines3 runtime is not installed in this environment."
         return [
             ControllerOptionModel(
                 mode="pid",
@@ -143,11 +153,8 @@ class MissionRuntimeService:
                 mode="rl_phase_switched",
                 label=self._registry.rl_phase_switched.label,
                 description=self._registry.rl_phase_switched.description,
-                available=self._registry.rl_phase_switched.available,
-                details={
-                    "takeoff": self._registry.rl_phase_switched.takeoff.label,
-                    "flight_plan": self._registry.rl_phase_switched.flight_plan.label,
-                },
+                available=rl_available,
+                details=rl_details,
             ),
         ]
 
@@ -260,6 +267,14 @@ class MissionRuntimeService:
                     detail=(
                         "RL phase-switched mode is unavailable because "
                         "one or more checkpoints are missing."
+                    ),
+                )
+            if not self._rl_runtime_available:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "RL phase-switched mode is unavailable because "
+                        "Stable-Baselines3 runtime dependencies are not installed."
                     ),
                 )
             pilot = RLPhaseSwitchedPilot(self._registry.rl_phase_switched)

@@ -103,11 +103,10 @@ A live local mission-control product now lives in [`apps/mission-control`](apps/
 Quick start:
 
 ```bash
-cd apps/mission-control
-docker compose up --build
+python3 apps/mission-control/run.py
 ```
 
-Or run the services directly with the repo virtualenv and `npm`. Full setup, controller registry, checkpoints, and local dev details are documented in [`apps/mission-control/README.md`](apps/mission-control/README.md).
+Docker is still available with `cd apps/mission-control && docker compose up --build`. Full setup, controller registry, checkpoints, and local dev details are documented in [`apps/mission-control/README.md`](apps/mission-control/README.md).
 
 ## Architecture Overview
 

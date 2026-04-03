@@ -110,6 +110,27 @@ async def test_rl_mode_rejects_missing_checkpoints(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
+async def test_rl_mode_rejects_missing_runtime_dependencies(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry_path = tmp_path / "controllers.yaml"
+    takeoff_model = tmp_path / "takeoff_model.zip"
+    flight_plan_model = tmp_path / "flight_plan_model.zip"
+    takeoff_model.write_text("stub", encoding="utf-8")
+    flight_plan_model.write_text("stub", encoding="utf-8")
+    _write_registry(
+        registry_path,
+        takeoff_model=str(takeoff_model),
+        flight_plan_model=str(flight_plan_model),
+    )
+    monkeypatch.setattr("app.session.rl_dependencies_available", lambda: False)
+    runtime = MissionRuntimeService(controller_registry_path=registry_path)
+    with pytest.raises(HTTPException, match="runtime dependencies"):
+        await runtime.start_session(SessionStartRequest(controller_mode="rl_phase_switched"))
+
+
+@pytest.mark.asyncio
 async def test_invalid_phase_commands_raise_conflict(tmp_path: Path) -> None:
     registry_path = tmp_path / "controllers.yaml"
     _write_registry(registry_path)
@@ -129,3 +150,26 @@ def test_controller_registry_reports_missing_rl_checkpoints(tmp_path: Path) -> N
     registry = ControllerRegistry.from_path(registry_path)
     assert registry.pid.label == "PID"
     assert registry.rl_phase_switched.available is False
+
+
+@pytest.mark.asyncio
+async def test_list_controllers_marks_rl_unavailable_without_runtime_deps(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    registry_path = tmp_path / "controllers.yaml"
+    takeoff_model = tmp_path / "takeoff_model.zip"
+    flight_plan_model = tmp_path / "flight_plan_model.zip"
+    takeoff_model.write_text("stub", encoding="utf-8")
+    flight_plan_model.write_text("stub", encoding="utf-8")
+    _write_registry(
+        registry_path,
+        takeoff_model=str(takeoff_model),
+        flight_plan_model=str(flight_plan_model),
+    )
+    monkeypatch.setattr("app.session.rl_dependencies_available", lambda: False)
+    runtime = MissionRuntimeService(controller_registry_path=registry_path)
+    controllers = await runtime.list_controllers()
+    rl_controller = next(item for item in controllers if item.mode == "rl_phase_switched")
+    assert rl_controller.available is False
+    assert "runtime" in rl_controller.details["status"].lower()

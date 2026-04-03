@@ -31,8 +31,17 @@ class MissionPilot(Protocol):
         route_progress: RouteProgress | None,
         takeoff_config: TakeoffTaskConfig,
         dt_s: float,
-    ) -> ControlCommand:
+        ) -> ControlCommand:
         """Produce the next live control command."""
+
+
+def rl_dependencies_available() -> bool:
+    """Return whether the RL inference stack is installed."""
+    try:
+        load_model_class("ppo")
+    except RuntimeError:
+        return False
+    return True
 
 
 @dataclass

@@ -130,6 +130,30 @@ Planner actions:
 
 ## Local Development
 
+### One Command Launcher
+
+The simplest way to start both services is:
+
+```bash
+python3 apps/mission-control/run.py
+```
+
+Or, from the repo root on macOS/Linux:
+
+```bash
+./apps/mission-control/run.py
+```
+
+That script:
+
+- checks for the repo virtualenv and backend dependencies
+- installs frontend `node_modules` automatically if needed
+- starts the FastAPI backend on `8000`
+- starts the Vite frontend on `5173`
+- shuts both down together on `Ctrl-C`
+
+This launcher uses your host Python environment, so if you installed the repo with `.[rl]`, the RL controller mode is available there too.
+
 ### Python Backend
 
 From the repo root:
@@ -174,6 +198,13 @@ Services:
 - Web: `http://localhost:5173`
 
 The compose stack mounts the repo into both containers so the API can import `flightlab` and resolve checkpoints from the local artifact tree.
+
+Important:
+
+- the Docker path is now intentionally CPU-only and lightweight by default
+- it does not install the RL stack inside the API image
+- this avoids large Linux `torch` / CUDA package downloads on macOS-hosted Docker
+- inside Docker, `pid` mode works out of the box and `rl_phase_switched` will show as unavailable unless you extend the image with RL dependencies yourself
 
 ## Controller Registry
 

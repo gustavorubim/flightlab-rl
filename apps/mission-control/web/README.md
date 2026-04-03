@@ -19,6 +19,12 @@ npm install
 ## Run locally
 
 ```bash
+python3 ../run.py
+```
+
+If you only want the frontend process and already have the API running:
+
+```bash
 npm run dev
 ```
 
